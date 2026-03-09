@@ -1,0 +1,1272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ScriptForge NG</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800;900&family=DM+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --gold: #D4A843; --gl: #F5D06E; --gd: #8B6010;
+  --bg: #080808; --p: #111; --b: #1e1e1e; --b2: #2a2a2a;
+  --t: #F0F0F0; --m: #777; --m2: #555;
+  --gr: #22c55e; --rd: #ef4444; --bl: #3b82f6;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t); min-height: 100vh; }
+
+/* NAV */
+nav {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 24px; height: 56px;
+  border-bottom: 1px solid var(--b); background: rgba(8,8,8,.98);
+  position: sticky; top: 0; z-index: 200; backdrop-filter: blur(20px);
+}
+.logo { font-family: 'Syne', sans-serif; font-size: 1rem; font-weight: 900; letter-spacing: -.02em; background: linear-gradient(135deg, var(--gl), var(--gold)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.tabs { display: flex; gap: 2px; }
+.tab { background: none; border: none; color: var(--m); font-size: .78rem; font-weight: 500; padding: 6px 13px; border-radius: 6px; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all .15s; }
+.tab:hover { color: var(--t); background: var(--b); }
+.tab.on { color: var(--gold); background: rgba(212,168,67,.12); }
+
+/* PAGES */
+.pg { display: none; max-width: 1160px; margin: 0 auto; padding: 28px 20px 100px; }
+.pg.on { display: block; }
+
+/* CARDS */
+.card { background: var(--p); border: 1px solid var(--b); border-radius: 12px; padding: 20px; margin-bottom: 14px; }
+.card-label { font-family: 'Syne', sans-serif; font-size: .6rem; font-weight: 700; text-transform: uppercase; letter-spacing: .16em; color: var(--gold); margin-bottom: 12px; }
+
+/* FORMS */
+label { display: block; font-size: .75rem; color: var(--m); margin-bottom: 4px; margin-top: 10px; }
+label:first-of-type { margin-top: 0; }
+input, select, textarea {
+  width: 100%; background: #0a0a0a; border: 1px solid var(--b2);
+  border-radius: 8px; color: var(--t); font-family: 'DM Sans', sans-serif;
+  font-size: .85rem; padding: 9px 12px; outline: none; transition: border .2s;
+}
+input:focus, select:focus, textarea:focus { border-color: var(--gold); }
+textarea { resize: vertical; min-height: 80px; }
+select option { background: #0a0a0a; }
+
+/* BUTTONS */
+.btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 9px 18px; border-radius: 8px;
+  font-family: 'DM Sans', sans-serif; font-size: .82rem; font-weight: 600;
+  cursor: pointer; border: none; transition: all .18s; white-space: nowrap;
+}
+.btn:disabled { opacity: .35; cursor: not-allowed !important; pointer-events: none; }
+.btn-gold { background: linear-gradient(135deg, var(--gl), var(--gd)); color: #000; }
+.btn-gold:hover { box-shadow: 0 0 22px rgba(212,168,67,.4); transform: translateY(-1px); }
+.btn-outline { background: none; border: 1px solid var(--b2); color: var(--m); }
+.btn-outline:hover { border-color: var(--gold); color: var(--gold); }
+.btn-full { width: 100%; justify-content: center; padding: 12px; }
+.btn-big { font-size: .9rem; padding: 13px 24px; }
+
+/* SPINNER */
+.spin { width: 14px; height: 14px; border: 2px solid rgba(255,255,255,.1); border-top-color: currentColor; border-radius: 50%; animation: sp .6s linear infinite; display: inline-block; flex-shrink: 0; }
+.spin-gold { border-color: rgba(212,168,67,.15) !important; border-top-color: var(--gold) !important; }
+@keyframes sp { to { transform: rotate(360deg); } }
+
+/* SCRIPT PAGE */
+.sg { display: grid; grid-template-columns: 280px 1fr; gap: 18px; }
+.nrow { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 12px; }
+.npill { padding: 11px 12px; border: 2px solid var(--b2); border-radius: 10px; cursor: pointer; transition: all .18s; background: #0a0a0a; display: flex; align-items: center; gap: 8px; }
+.npill:hover { border-color: var(--gd); }
+.npill.on { border-color: var(--gold); background: rgba(212,168,67,.06); }
+.npill .ico { font-size: 1.2rem; }
+.npill .nm { font-family: 'Syne', sans-serif; font-weight: 700; font-size: .8rem; }
+.npill .ds { font-size: .67rem; color: var(--m); }
+
+.style-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 6px; margin-bottom: 12px; }
+.spill { padding: 8px 5px; border: 1px solid var(--b2); border-radius: 8px; cursor: pointer; text-align: center; transition: all .18s; background: #0a0a0a; font-size: .7rem; color: var(--m); }
+.spill:hover { border-color: var(--gd); color: var(--t); }
+.spill.on { border-color: var(--gold); background: rgba(212,168,67,.07); color: var(--gold); }
+.spill .si { display: block; font-size: 1.05rem; margin-bottom: 3px; }
+
+.sbox { background: #0a0a0a; border: 1px solid var(--b2); border-radius: 10px; padding: 18px; font-size: .88rem; line-height: 1.85; min-height: 160px; }
+.sbox.idle { color: var(--m); font-style: italic; display: flex; align-items: center; justify-content: center; text-align: center; min-height: 200px; }
+.sbox.loading { display: flex; align-items: center; justify-content: center; gap: 12px; color: var(--m); font-style: italic; min-height: 200px; }
+
+/* VIDEO PAGE */
+.vg { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+
+/* steps */
+.step-list { display: flex; flex-direction: column; gap: 0; }
+.vstep { display: flex; gap: 14px; padding: 16px 0; border-bottom: 1px solid var(--b); position: relative; }
+.vstep:last-child { border-bottom: none; }
+.vstep-num { width: 28px; height: 28px; border-radius: 50%; border: 2px solid var(--b2); display: flex; align-items: center; justify-content: center; font-family: 'Syne', sans-serif; font-weight: 800; font-size: .7rem; color: var(--m); flex-shrink: 0; background: #0a0a0a; }
+.vstep.done .vstep-num { border-color: var(--gr); background: rgba(34,197,94,.12); color: var(--gr); }
+.vstep-body { flex: 1; }
+.vstep-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: .85rem; margin-bottom: 4px; }
+.vstep-desc { font-size: .78rem; color: var(--m); line-height: 1.55; }
+.vstep-action { margin-top: 10px; }
+
+/* video preview area */
+.preview-box { background: #050505; border: 1px solid var(--b); border-radius: 12px; min-height: 300px; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 10px; text-align: center; padding: 24px; position: relative; overflow: hidden; }
+.preview-box video { max-width: 100%; max-height: 380px; border-radius: 8px; }
+.preview-big-icon { font-size: 3rem; display: block; margin-bottom: 8px; }
+.preview-text { font-size: .83rem; color: var(--m); line-height: 1.6; max-width: 260px; }
+
+/* platform cards */
+.platform-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.pcard { display: flex; align-items: center; gap: 10px; padding: 12px; background: #0a0a0a; border: 1px solid var(--b2); border-radius: 9px; text-decoration: none; color: var(--t); transition: all .18s; cursor: pointer; }
+.pcard:hover { border-color: var(--gold); background: rgba(212,168,67,.04); }
+.pcard .pico { font-size: 1.6rem; flex-shrink: 0; }
+.pcard .pname { font-family: 'Syne', sans-serif; font-weight: 700; font-size: .82rem; }
+.pcard .pdesc { font-size: .7rem; color: var(--m); margin-top: 1px; }
+
+/* CHAT */
+.cg { display: grid; grid-template-columns: 1fr 300px; gap: 18px; max-width: 1020px; margin: 0 auto; }
+.cbox { background: var(--p); border: 1px solid var(--b); border-radius: 12px; height: 560px; display: flex; flex-direction: column; overflow: hidden; }
+.chdr { padding: 12px 16px; border-bottom: 1px solid var(--b); display: flex; align-items: center; gap: 8px; }
+.dot { width: 7px; height: 7px; border-radius: 50%; background: var(--gr); animation: pulse 2s infinite; flex-shrink: 0; }
+@keyframes pulse { 0%,100%{box-shadow:0 0 0 0 rgba(34,197,94,.5)} 50%{box-shadow:0 0 0 5px rgba(34,197,94,0)} }
+.chdr-label { font-family: 'Syne', sans-serif; font-size: .68rem; font-weight: 700; text-transform: uppercase; letter-spacing: .12em; }
+.cmsgs { flex: 1; overflow-y: auto; padding: 14px; display: flex; flex-direction: column; gap: 8px; }
+.msg { max-width: 88%; padding: 10px 14px; border-radius: 10px; font-size: .84rem; line-height: 1.6; white-space: pre-wrap; word-break: break-word; }
+.msg.ai { background: #0d0d0d; border: 1px solid var(--b2); align-self: flex-start; }
+.msg.user { background: rgba(212,168,67,.1); border: 1px solid rgba(212,168,67,.2); align-self: flex-end; }
+.cinrow { padding: 10px; border-top: 1px solid var(--b); display: flex; gap: 7px; }
+.cinrow input { flex: 1; }
+.cinrow button { background: linear-gradient(135deg, var(--gl), var(--gd)); border: none; border-radius: 8px; padding: 9px 16px; color: #000; font-family: 'Syne', sans-serif; font-size: .7rem; font-weight: 800; text-transform: uppercase; letter-spacing: .06em; cursor: pointer; white-space: nowrap; }
+.cinrow button:disabled { opacity: .4; cursor: not-allowed; }
+.qcard { background: var(--p); border: 1px solid var(--b); border-radius: 12px; padding: 14px; margin-bottom: 10px; }
+.qcard h4 { font-family: 'Syne', sans-serif; font-size: .62rem; font-weight: 700; text-transform: uppercase; letter-spacing: .14em; color: var(--gold); margin-bottom: 8px; }
+.q { display: block; width: 100%; text-align: left; background: #0a0a0a; border: 1px solid var(--b2); border-radius: 7px; color: var(--m); font-family: 'DM Sans', sans-serif; font-size: .76rem; padding: 7px 10px; margin-bottom: 5px; cursor: pointer; transition: all .18s; line-height: 1.4; }
+.q:last-child { margin-bottom: 0; }
+.q:hover { border-color: var(--gold); color: var(--t); }
+
+/* PLAN */
+.plan-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; max-width: 860px; margin: 0 auto 20px; }
+.psc { background: var(--p); border: 1px solid var(--b); border-radius: 12px; padding: 20px; }
+.psn { font-family: 'Syne', sans-serif; font-size: 2.8rem; font-weight: 900; background: linear-gradient(135deg, var(--gl), var(--gd)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; line-height: 1; }
+.psc h3 { font-family: 'Syne', sans-serif; font-size: .9rem; margin: 8px 0 5px; }
+.psc p { font-size: .8rem; color: var(--m); line-height: 1.6; }
+.tip { margin-top: 10px; background: #0a0a0a; border: 1px solid var(--b2); border-radius: 7px; padding: 8px 10px; font-size: .74rem; color: var(--t); }
+
+.calc-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; }
+.cresb { background: #0a0a0a; border: 1px solid var(--b2); border-radius: 10px; padding: 14px; text-align: center; }
+.cresv { font-family: 'Syne', sans-serif; font-size: 1.5rem; font-weight: 800; background: linear-gradient(135deg, var(--gl), var(--gold)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.cresl { font-size: .68rem; color: var(--m); margin-top: 3px; }
+
+/* TOAST */
+.toast { position: fixed; bottom: 22px; left: 50%; transform: translateX(-50%) translateY(80px); background: var(--gr); color: #000; font-weight: 700; font-size: .8rem; padding: 10px 22px; border-radius: 40px; z-index: 9999; transition: transform .3s cubic-bezier(.34,1.56,.64,1); pointer-events: none; white-space: nowrap; max-width: 90vw; overflow: hidden; text-overflow: ellipsis; }
+.toast.on { transform: translateX(-50%) translateY(0); }
+
+/* SCRIPT copied highlight */
+.script-copied { animation: flashGold .4s ease; }
+@keyframes flashGold { 0%,100%{background:#0a0a0a} 50%{background:rgba(212,168,67,.1)} }
+
+::-webkit-scrollbar { width: 3px; } ::-webkit-scrollbar-thumb { background: var(--b2); border-radius: 3px; }
+@media(max-width:780px) { .sg,.vg,.cg,.plan-grid { grid-template-columns: 1fr !important; } .tabs { gap: 1px; } .tab { padding: 6px 9px; font-size: .72rem; } }
+
+/* ═══ OJA MAKER ═══ */
+.oja-hero{background:linear-gradient(135deg,rgba(26,107,58,.12),rgba(61,220,132,.04));border:1px solid rgba(61,220,132,.18);border-radius:14px;padding:22px;margin-bottom:20px;position:relative;overflow:hidden}
+.oja-hero::after{content:'🇳🇬';position:absolute;right:22px;top:50%;transform:translateY(-50%);font-size:5rem;opacity:.06;pointer-events:none}
+.oja-title{font-family:'Syne',sans-serif;font-size:1.25rem;font-weight:900;color:#3ddc84;margin-bottom:5px}
+.oja-sub{font-size:.81rem;color:var(--m);line-height:1.65;max-width:680px}
+.oja-stats{display:flex;gap:12px;margin-top:14px;flex-wrap:wrap}
+.oja-stat{text-align:center;padding:9px 14px;background:rgba(61,220,132,.07);border:1px solid rgba(61,220,132,.15);border-radius:8px;flex:1;min-width:80px}
+.oja-stat-n{font-family:'Syne',sans-serif;font-size:1.2rem;font-weight:800;color:#3ddc84}
+.oja-stat-l{font-size:.59rem;color:var(--m);text-transform:uppercase;letter-spacing:.05em;margin-top:2px}
+.oja-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.oja-ctypes{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:12px}
+.oct{padding:10px 7px;border:2px solid var(--b2);border-radius:9px;cursor:pointer;text-align:center;transition:all .18s;background:#0a0a0a}
+.oct:hover{border-color:#2d9c57}
+.oct.on{border-color:#3ddc84;background:rgba(61,220,132,.07)}
+.oct .oico{font-size:1.1rem;display:block;margin-bottom:3px}
+.oct .onm{font-family:'Syne',sans-serif;font-size:.7rem;font-weight:700;color:var(--t)}
+.oct .ods{font-size:.62rem;color:var(--m)}
+.oja-angle-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin-bottom:12px}
+.oja-angle{padding:7px 5px;border:1px solid var(--b2);border-radius:8px;cursor:pointer;text-align:center;transition:all .18s;background:#0a0a0a;font-size:.68rem;color:var(--m)}
+.oja-angle:hover{border-color:#2d9c57;color:var(--t)}
+.oja-angle.on{border-color:#3ddc84;background:rgba(61,220,132,.07);color:#3ddc84}
+.oja-angle .ai{display:block;font-size:.98rem;margin-bottom:2px}
+.oja-gen-btn{width:100%;padding:13px;background:linear-gradient(135deg,#2d9c57,#1a6b3a);color:#fff;font-family:'Syne',sans-serif;font-weight:800;font-size:.88rem;border:none;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;transition:all .2s;margin-top:0}
+.oja-gen-btn:hover{box-shadow:0 0 22px rgba(61,220,132,.35);transform:translateY(-1px)}
+.oja-gen-btn:disabled{opacity:.4;cursor:not-allowed;transform:none;box-shadow:none}
+.day-sprint{display:flex;flex-direction:column;gap:7px}
+.day-row{background:#0a0a0a;border-radius:0 8px 8px 0;padding:10px 12px}
+.day-row.d1{border-left:3px solid var(--gold)}
+.day-row.d2{border-left:3px solid #3ddc84}
+.day-row.d3{border-left:3px solid var(--bl)}
+.day-row.d4{border-left:3px solid var(--rd)}
+.day-row.d5{border-left:3px solid var(--pu,#a855f7)}
+.day-row-t{font-family:'Syne',sans-serif;font-size:.75rem;font-weight:700;margin-bottom:3px}
+.day-row-d{font-size:.72rem;color:var(--m);line-height:1.55}
+.quick-msgs{display:flex;flex-direction:column;gap:6px}
+.qmsg-btn{width:100%;text-align:left;background:#0a0a0a;border:1px solid var(--b2);border-radius:7px;color:var(--m);font-family:'DM Sans',sans-serif;font-size:.77rem;padding:9px 12px;cursor:pointer;transition:all .18s}
+.qmsg-btn:hover{border-color:var(--gold);color:var(--t)}
+@media(max-width:780px){.oja-grid{grid-template-columns:1fr!important}.oja-ctypes{grid-template-columns:repeat(2,1fr)!important}}
+
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="logo">ScriptForge NG</div>
+  <div class="tabs">
+    <button class="tab on" onclick="go('script',this)">📝 Script</button>
+    <button class="tab" onclick="go('video',this)">🎬 AI Video</button>
+    <button class="tab" onclick="go('oja',this)">🛒 OJA Maker</button>
+    <button class="tab" onclick="go('chat',this)">🤖 Chat</button>
+    <button class="tab" onclick="go('content',this)">💡 Content Ideas</button>
+    <button class="tab" onclick="go('plan',this)">🚀 Plan</button>
+  </div>
+</nav>
+
+<!-- ═══ SCRIPT PAGE ═══ -->
+<div id="pg-script" class="pg on">
+  <div class="sg">
+    <!-- LEFT CONTROLS -->
+    <div>
+      <div class="card">
+        <div class="card-label">Niche</div>
+        <div class="nrow">
+          <div class="npill on" id="nr" onclick="setN('r')"><span class="ico">🏠</span><div><div class="nm">Real Estate</div><div class="ds">Property & land</div></div></div>
+          <div class="npill" id="ns" onclick="setN('s')"><span class="ico">☀️</span><div><div class="nm">Solar</div><div class="ds">Inverter & install</div></div></div>
+          <div class="npill" id="ng" onclick="setN('g')"><span class="ico">📐</span><div><div class="nm">Surveying</div><div class="ds">GIS & coordinates</div></div></div>
+        </div>
+        <label>Company / Agent Name</label>
+        <input id="fn" placeholder="e.g. Premium Homes NG">
+        <label>Location</label>
+        <input id="fl" placeholder="e.g. Lekki, Abuja, Port Harcourt">
+        <label>Price / Offer</label>
+        <input id="fp" placeholder="e.g. ₦25M flexible payment plan">
+        <label>Target Audience</label>
+        <input id="fa" placeholder="e.g. young professionals, diaspora">
+        <label>USP (optional)</label>
+        <input id="fu" placeholder="e.g. verified C of O, 0% interest">
+      </div>
+
+      <div class="card">
+        <div class="card-label">Script Style</div>
+        <div class="style-grid">
+          <div class="spill on" onclick="setSt(0,this)"><span class="si">⚡</span>Stop Renting</div>
+          <div class="spill" onclick="setSt(1,this)"><span class="si">💎</span>Hidden Gem</div>
+          <div class="spill" onclick="setSt(2,this)"><span class="si">🚩</span>Avoid Mistake</div>
+          <div class="spill" onclick="setSt(3,this)"><span class="si">🎯</span>Day in Life</div>
+          <div class="spill" onclick="setSt(4,this)"><span class="si">💰</span>Solar Savings</div>
+          <div class="spill" onclick="setSt(5,this)"><span class="si">✨</span>Best Angle</div>
+          <div class="spill" onclick="setSt(6,this)"><span class="si">🗺️</span>Don't Be a Victim</div>
+          <div class="spill" onclick="setSt(7,this)"><span class="si">📍</span>Professional Flex</div>
+          <div class="spill" onclick="setSt(8,this)"><span class="si">🎓</span>Educational</div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <div>
+            <label>Platform</label>
+            <select id="fpl"><option>TikTok</option><option>Instagram Reels</option><option>YouTube Shorts</option><option>WhatsApp Status</option></select>
+          </div>
+          <div>
+            <label>Duration</label>
+            <select id="fd"><option>15 seconds</option><option selected>30 seconds</option><option>60 seconds</option></select>
+          </div>
+        </div>
+      </div>
+
+      <button class="btn btn-gold btn-full btn-big" id="genBtn" onclick="genScript()">⚡ Generate Script</button>
+      <button class="btn btn-outline btn-full" id="toVidBtn" style="margin-top:8px" disabled onclick="goToVideo()">🎬 Send to AI Video Creator →</button>
+    </div>
+
+    <!-- RIGHT OUTPUT -->
+    <div>
+      <div class="card">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+          <div class="card-label" style="margin:0">Your Script</div>
+          <div style="display:flex;gap:6px">
+            <button class="btn btn-outline" id="cpBtn" onclick="cpScript()" disabled style="font-size:.75rem;padding:6px 12px">📋 Copy</button>
+            <button class="btn btn-outline" id="dlBtn" onclick="dlScript()" disabled style="font-size:.75rem;padding:6px 12px">⬇ Save</button>
+          </div>
+        </div>
+        <div class="sbox idle" id="sbox">Click "Generate Script" to create your viral Nigerian video script instantly — no API key needed</div>
+      </div>
+
+      <div class="card">
+        <div class="card-label">Refine</div>
+        <div style="display:flex;gap:7px;flex-wrap:wrap">
+          <button class="btn btn-outline" style="font-size:.75rem" onclick="refine('shorter')">✂️ Shorter</button>
+          <button class="btn btn-outline" style="font-size:.75rem" onclick="refine('punchier')">💥 Punchier</button>
+          <button class="btn btn-outline" style="font-size:.75rem" onclick="refine('hooks')">🪝 New Hooks</button>
+          <button class="btn btn-outline" style="font-size:.75rem" onclick="refine('caption')">📝 Caption</button>
+          <button class="btn btn-outline" style="font-size:.75rem" onclick="refine('objections')">🛡 Objections</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ VIDEO PAGE ═══ -->
+<div id="pg-video" class="pg">
+  <div style="margin-bottom:22px">
+    <h2 style="font-family:'Syne',sans-serif;font-size:1.3rem;font-weight:800;margin-bottom:5px">🎭 AI Avatar Video Creator</h2>
+    <p style="color:var(--m);font-size:.83rem">Generate your script, copy the clean voiceover, then paste it into a free AI video tool below. Your video is ready in minutes.</p>
+  </div>
+  <div class="vg">
+    <!-- LEFT: Script + instructions -->
+    <div>
+      <div class="card">
+        <div class="card-label">Script for Your Avatar</div>
+        <textarea id="vidScript" rows="7" placeholder="Your clean voiceover script will appear here after you generate a script on the Script tab, or paste one manually..." oninput="updChars()"></textarea>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-top:8px">
+          <span id="charCount" style="font-size:.72rem;color:var(--m)">0 chars</span>
+          <button class="btn btn-outline" onclick="cleanForSpeech()" style="font-size:.73rem;padding:5px 10px">✂️ Clean for Speech</button>
+        </div>
+        <button class="btn btn-gold btn-full" style="margin-top:12px" onclick="copyVidScript()">📋 Copy Script for Avatar Tool</button>
+        <div style="margin-top:8px;padding:10px 12px;background:rgba(212,168,67,.04);border:1px solid rgba(212,168,67,.15);border-radius:8px;font-size:.76rem;color:var(--m);line-height:1.6">
+          💡 <strong style="color:var(--t)">Tip:</strong> Generate a script first → click "Send to AI Video Creator" → script appears here already cleaned. Then copy and paste into any tool below.
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-label">Step-by-Step: Make Your Video</div>
+        <div class="step-list">
+          <div class="vstep done">
+            <div class="vstep-num">✓</div>
+            <div class="vstep-body">
+              <div class="vstep-title">Generate Your Script</div>
+              <div class="vstep-desc">Use the Script tab to generate a viral Nigerian real estate or solar script with AI.</div>
+            </div>
+          </div>
+          <div class="vstep">
+            <div class="vstep-num">2</div>
+            <div class="vstep-body">
+              <div class="vstep-title">Copy Your Clean Script</div>
+              <div class="vstep-desc">Click "Copy Script for Avatar Tool" above. The clean voiceover text is now on your clipboard.</div>
+            </div>
+          </div>
+          <div class="vstep">
+            <div class="vstep-num">3</div>
+            <div class="vstep-body">
+              <div class="vstep-title">Open a Free AI Video Tool</div>
+              <div class="vstep-desc">Pick any tool below — all are 100% free to start. D-ID Studio and HeyGen are the easiest.</div>
+            </div>
+          </div>
+          <div class="vstep">
+            <div class="vstep-num">4</div>
+            <div class="vstep-body">
+              <div class="vstep-title">Pick Avatar → Paste Script → Generate</div>
+              <div class="vstep-desc">Select an AI avatar, paste your script, and click generate. Your talking-head video is ready in 2–3 minutes.</div>
+            </div>
+          </div>
+          <div class="vstep">
+            <div class="vstep-num">5</div>
+            <div class="vstep-body">
+              <div class="vstep-title">Download & Post</div>
+              <div class="vstep-desc">Download the MP4. Post directly to TikTok, Instagram Reels, or WhatsApp Status.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: Free tools -->
+    <div>
+      <div class="card">
+        <div class="card-label">🆓 Free AI Avatar Video Tools</div>
+        <p style="font-size:.78rem;color:var(--m);margin-bottom:14px;line-height:1.6">All tools below are free to start. No payment needed to make your first videos.</p>
+
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <a href="https://studio.d-id.com" target="_blank" class="pcard" style="border-color:rgba(212,168,67,.3)">
+            <div style="font-size:1.8rem">🎭</div>
+            <div style="flex:1">
+              <div class="pname" style="color:var(--gold)">D-ID Studio ⭐ BEST</div>
+              <div class="pdesc">Free 20 credits (~10 videos) • No card • Easiest workflow</div>
+              <div style="font-size:.68rem;color:var(--gr);margin-top:3px">studio.d-id.com → Sign up → New Video → Paste script</div>
+            </div>
+          </a>
+
+          <a href="https://heygen.com" target="_blank" class="pcard">
+            <div style="font-size:1.8rem">🤖</div>
+            <div style="flex:1">
+              <div class="pname">HeyGen</div>
+              <div class="pdesc">Free 1 min/month • 100+ avatars • Best quality output</div>
+              <div style="font-size:.68rem;color:var(--m);margin-top:3px">heygen.com → Create Video → AI Avatar → Paste script</div>
+            </div>
+          </a>
+
+          <a href="https://invideo.io/ai/" target="_blank" class="pcard">
+            <div style="font-size:1.8rem">🎬</div>
+            <div style="flex:1">
+              <div class="pname">InVideo AI</div>
+              <div class="pdesc">Free plan • AI avatar + stock footage combo</div>
+              <div style="font-size:.68rem;color:var(--m);margin-top:3px">invideo.io → Generate → Paste script → Pick avatar</div>
+            </div>
+          </a>
+
+          <a href="https://app.synthesia.io" target="_blank" class="pcard">
+            <div style="font-size:1.8rem">🧑‍💼</div>
+            <div style="flex:1">
+              <div class="pname">Synthesia</div>
+              <div class="pdesc">Free demo • Most realistic presenters available</div>
+              <div style="font-size:.68rem;color:var(--m);margin-top:3px">synthesia.io → New Video → Choose avatar → Add script</div>
+            </div>
+          </a>
+
+          <a href="https://www.captions.ai" target="_blank" class="pcard">
+            <div style="font-size:1.8rem">📱</div>
+            <div style="flex:1">
+              <div class="pname">Captions AI (Mobile)</div>
+              <div class="pdesc">Free on iOS/Android • AI avatar on your phone</div>
+              <div style="font-size:.68rem;color:var(--m);margin-top:3px">Best for TikTok-style vertical videos on mobile</div>
+            </div>
+          </a>
+        </div>
+      </div>
+
+      <div class="card" style="background:rgba(34,197,94,.04);border-color:rgba(34,197,94,.2)">
+        <div class="card-label" style="color:var(--gr)">🎯 Quickest Workflow (D-ID)</div>
+        <ol style="font-size:.78rem;color:var(--m);line-height:2;padding-left:18px">
+          <li>Generate script on Script tab</li>
+          <li>Click "Send to AI Video Creator →"</li>
+          <li>Click "Copy Script for Avatar Tool"</li>
+          <li>Open <a href="https://studio.d-id.com" target="_blank" style="color:var(--gold)">studio.d-id.com</a> — sign up free</li>
+          <li>Click "Create Video" → "Script"</li>
+          <li>Choose a presenter → paste your script</li>
+          <li>Click Generate → Download MP4 in 2 mins</li>
+        </ol>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ CHAT PAGE ═══ -->
+<div id="pg-chat" class="pg">
+  <div style="max-width:1020px;margin:0 auto">
+    <div style="margin-bottom:18px">
+      <h2 style="font-family:'Syne',sans-serif;font-size:1.3rem;font-weight:800;margin-bottom:4px">🤖 AI Marketing Consultant</h2>
+      <p style="color:var(--m);font-size:.82rem">Powered by Claude AI — no key needed. Get real Nigerian outreach scripts, ₦ calculations, objection handlers, content plans.</p>
+    </div>
+    <div class="cg">
+      <div class="cbox">
+        <div class="chdr"><div class="dot"></div><span class="chdr-label">Claude AI — Live</span></div>
+        <div class="cmsgs" id="cmsgs">
+          <div class="msg ai">👋 Welcome! I'm your Nigerian real estate & solar marketing consultant.
+
+I can write right now — no setup needed:
+• WhatsApp / Instagram outreach messages
+• Solar savings in exact ₦ (I'll do the maths)
+• Land-buying red flags (any number)
+• Coordinate verification scripts for SurveyPro Elite
+• Objection-handling scripts
+• 30-day content calendars
+• Captions + Nigerian hashtags
+• Pricing strategy for your video service
+• Cold proposal emails to developers
+
+What do you need?</div>
+        </div>
+        <div class="cinrow">
+          <input id="cin" placeholder="Ask anything about Nigerian real estate or solar marketing..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendChat()}">
+          <button id="csend" onclick="sendChat()">Send →</button>
+        </div>
+      </div>
+      <div>
+        <div class="qcard">
+          <h4>🏠 Real Estate</h4>
+          <button class="q" onclick="useQ(this)">Write 5 red flags before buying land in Nigeria</button>
+          <button class="q" onclick="useQ(this)">WhatsApp DM offering video service to a Lagos real estate agent for ₦120,000/month</button>
+          <button class="q" onclick="useQ(this)">7 viral TikTok hooks for a Lekki real estate agent</button>
+          <button class="q" onclick="useQ(this)">Objection handler: "I'll think about it" — give me 3 scripts</button>
+          <button class="q" onclick="useQ(this)">30-day Instagram content calendar for Lagos real estate agent</button>
+        </div>
+        <div class="qcard">
+          <h4>☀️ Solar</h4>
+          <button class="q" onclick="useQ(this)">Calculate 5-year savings from switching a 5kVA generator to solar at ₦1,200/litre petrol</button>
+          <button class="q" onclick="useQ(this)">5 viral hooks for a solar company targeting Lagos homeowners</button>
+          <button class="q" onclick="useQ(this)">Top 5 objections Nigerians have about solar + script to handle each one</button>
+        </div>
+        <div class="qcard">
+          <h4>💼 Business</h4>
+          <button class="q" onclick="useQ(this)">DM script to land my first video content client on Instagram</button>
+          <button class="q" onclick="useQ(this)">How to price video content service for Nigerian real estate agents</button>
+          <button class="q" onclick="useQ(this)">Cold email to Lagos property developer for ₦150,000/month video retainer</button>
+        </div>
+        <div class="qcard">
+          <h4>📐 Surveying & GIS</h4>
+          <button class="q" onclick="useQ(this)">Write a TikTok script warning Nigerians about buying land without coordinate verification</button>
+          <button class="q" onclick="useQ(this)">Caption for Instagram showcasing SurveyPro Elite drone/GPS equipment rental</button>
+          <button class="q" onclick="useQ(this)">3 documents every land buyer in Lagos must demand before paying</button>
+          <button class="q" onclick="useQ(this)">WhatsApp DM offering surveying & GIS services to a property developer</button>
+          <button class="q" onclick="useQ(this)">5 viral hooks exposing land scams in Nigeria for a surveying firm</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ CONTENT IDEAS PAGE ═══ -->
+<div id="pg-content" class="pg">
+  <div style="max-width:900px;margin:0 auto">
+    <div style="margin-bottom:24px">
+      <h2 style="font-family:'Syne',sans-serif;font-size:1.4rem;font-weight:800;margin-bottom:6px">💡 High-Engagement Content Ideas</h2>
+      <p style="color:var(--m);font-size:.84rem">Ready-to-use TikTok / Instagram / Facebook content for Surveying, GIS & Real Estate. Scare people about scams — then offer your platform as the solution.</p>
+    </div>
+
+    <!-- Idea 1 -->
+    <div class="card" style="border-left:3px solid var(--rd)">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+        <div style="background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.3);border-radius:8px;padding:6px 12px;font-family:'Syne',sans-serif;font-size:.65rem;font-weight:700;color:var(--rd);letter-spacing:.1em;text-transform:uppercase">Content Idea 1</div>
+        <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:.95rem">The "Don't Be a Victim" Hook</div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+        <div>
+          <div style="font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--m);margin-bottom:6px">📹 Video Style</div>
+          <p style="font-size:.82rem;color:var(--t);line-height:1.65">You pointing at a <strong>"For Sale" sign</strong> on a bush land. Face to camera, urgent energy. Shoot vertical for TikTok/Reels.</p>
+        </div>
+        <div>
+          <div style="font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--m);margin-bottom:6px">📱 Text on Screen</div>
+          <div style="background:#0a0a0a;border:1px solid var(--b2);border-radius:8px;padding:10px 12px;font-size:.85rem;font-weight:700;color:var(--t);line-height:1.5">"Before you pay ₦5 Million for this land, WATCH THIS."</div>
+        </div>
+      </div>
+      <div style="margin-top:14px">
+        <div style="font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--m);margin-bottom:6px">✍️ Caption</div>
+        <div style="background:#0a0a0a;border:1px solid var(--b2);border-radius:8px;padding:12px 14px;font-size:.82rem;color:var(--t);line-height:1.7">
+          Buying land in Nigeria without verifying the coordinates is like throwing money into the ocean. Use the Coordinate Tool on my site to see if that land is under Government Acquisition or if it's free.<br><br>
+          🔗 Check link in bio to verify now.
+        </div>
+      </div>
+      <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
+        <div style="background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);border-radius:6px;padding:4px 10px;font-size:.72rem;color:var(--rd)">🎯 Platform: TikTok / Instagram Reels</div>
+        <div style="background:rgba(212,168,67,.08);border:1px solid rgba(212,168,67,.2);border-radius:6px;padding:4px 10px;font-size:.72rem;color:var(--gold)">⚡ Style: Fear → Solution</div>
+        <button class="btn btn-outline" style="font-size:.72rem;padding:4px 12px;margin-left:auto" onclick="genIdeaScript(1)">⚡ Generate Full Script →</button>
+      </div>
+    </div>
+
+    <!-- Idea 2 -->
+    <div class="card" style="border-left:3px solid var(--bl)">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+        <div style="background:rgba(59,130,246,.12);border:1px solid rgba(59,130,246,.3);border-radius:8px;padding:6px 12px;font-family:'Syne',sans-serif;font-size:.65rem;font-weight:700;color:var(--bl);letter-spacing:.1em;text-transform:uppercase">Content Idea 2</div>
+        <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:.95rem">The "Professional Flex" Trust Builder</div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+        <div>
+          <div style="font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--m);margin-bottom:6px">📹 Video Style</div>
+          <p style="font-size:.82rem;color:var(--t);line-height:1.65">Screen recording of your <strong>SurveyPro Elite website</strong> scrolling through the Equipment Rental or GIS Tools section. Clean, professional. Add trending upbeat audio.</p>
+        </div>
+        <div>
+          <div style="font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--m);margin-bottom:6px">🎵 Audio</div>
+          <div style="background:#0a0a0a;border:1px solid var(--b2);border-radius:8px;padding:10px 12px;font-size:.82rem;color:var(--t);line-height:1.5">Use a trending professional / upbeat sound from TikTok or Instagram audio library</div>
+        </div>
+      </div>
+      <div style="margin-top:14px">
+        <div style="font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--m);margin-bottom:6px">✍️ Caption</div>
+        <div style="background:#0a0a0a;border:1px solid var(--b2);border-radius:8px;padding:12px 14px;font-size:.82rem;color:var(--t);line-height:1.7">
+          Why stress about finding a surveyor when you can book everything — from Drones to GPS — in one place?<br><br>
+          Surveying made easy for 2026. 🚀 Visit the platform today.<br><br>
+          🔗 Link in bio.
+        </div>
+      </div>
+      <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
+        <div style="background:rgba(59,130,246,.08);border:1px solid rgba(59,130,246,.2);border-radius:6px;padding:4px 10px;font-size:.72rem;color:var(--bl)">🎯 Platform: TikTok / Instagram Reels</div>
+        <div style="background:rgba(212,168,67,.08);border:1px solid rgba(212,168,67,.2);border-radius:6px;padding:4px 10px;font-size:.72rem;color:var(--gold)">⚡ Style: Authority & Trust</div>
+        <button class="btn btn-outline" style="font-size:.72rem;padding:4px 12px;margin-left:auto" onclick="genIdeaScript(2)">⚡ Generate Full Script →</button>
+      </div>
+    </div>
+
+    <!-- Idea 3 -->
+    <div class="card" style="border-left:3px solid var(--gr)">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+        <div style="background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.3);border-radius:8px;padding:6px 12px;font-family:'Syne',sans-serif;font-size:.65rem;font-weight:700;color:var(--gr);letter-spacing:.1em;text-transform:uppercase">Content Idea 3</div>
+        <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:.95rem">The "Educational" Carousel</div>
+      </div>
+      <div style="margin-bottom:14px">
+        <div style="font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--m);margin-bottom:8px">📱 Platform: LinkedIn / Facebook</div>
+        <p style="font-size:.82rem;color:var(--t);line-height:1.65">Create a carousel post (swipeable slides). Each slide builds on the last, ending with your platform CTA.</p>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div style="display:flex;gap:10px;align-items:flex-start">
+          <div style="width:32px;height:32px;border-radius:8px;background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.3);display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;font-size:.8rem;color:var(--gr);flex-shrink:0">1</div>
+          <div style="background:#0a0a0a;border:1px solid var(--b2);border-radius:8px;padding:10px 12px;flex:1;font-size:.82rem;color:var(--t);line-height:1.5"><strong>Slide 1 (Hook):</strong> "3 Documents you MUST ask for before buying land in Lagos"</div>
+        </div>
+        <div style="display:flex;gap:10px;align-items:flex-start">
+          <div style="width:32px;height:32px;border-radius:8px;background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.3);display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;font-size:.8rem;color:var(--gr);flex-shrink:0">2</div>
+          <div style="background:#0a0a0a;border:1px solid var(--b2);border-radius:8px;padding:10px 12px;flex:1;font-size:.82rem;color:var(--t);line-height:1.5"><strong>Slide 2:</strong> 1. Approved Survey Plan (Red Copy)</div>
+        </div>
+        <div style="display:flex;gap:10px;align-items:flex-start">
+          <div style="width:32px;height:32px;border-radius:8px;background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.3);display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;font-size:.8rem;color:var(--gr);flex-shrink:0">3</div>
+          <div style="background:#0a0a0a;border:1px solid var(--b2);border-radius:8px;padding:10px 12px;flex:1;font-size:.82rem;color:var(--t);line-height:1.5"><strong>Slide 3:</strong> 2. C of O or Governor's Consent</div>
+        </div>
+        <div style="display:flex;gap:10px;align-items:flex-start">
+          <div style="width:32px;height:32px;border-radius:8px;background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.3);display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;font-size:.8rem;color:var(--gr);flex-shrink:0">4</div>
+          <div style="background:#0a0a0a;border:1px solid var(--b2);border-radius:8px;padding:10px 12px;flex:1;font-size:.82rem;color:var(--t);line-height:1.5"><strong>Slide 4:</strong> 3. Receipt of Purchase</div>
+        </div>
+        <div style="display:flex;gap:10px;align-items:flex-start">
+          <div style="width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,var(--gl),var(--gd));display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;font-size:.8rem;color:#000;flex-shrink:0">5</div>
+          <div style="background:rgba(212,168,67,.06);border:1px solid rgba(212,168,67,.25);border-radius:8px;padding:10px 12px;flex:1;font-size:.82rem;color:var(--t);line-height:1.5"><strong style="color:var(--gold)">Slide 5 (CTA):</strong> "Confused? Upload your coordinates on <strong>SurveyPro Elite</strong> and let us do the heavy lifting for you."</div>
+        </div>
+      </div>
+      <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
+        <div style="background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.2);border-radius:6px;padding:4px 10px;font-size:.72rem;color:var(--gr)">🎯 Platform: LinkedIn / Facebook</div>
+        <div style="background:rgba(212,168,67,.08);border:1px solid rgba(212,168,67,.2);border-radius:6px;padding:4px 10px;font-size:.72rem;color:var(--gold)">⚡ Style: Educate → Convert</div>
+        <button class="btn btn-outline" style="font-size:.72rem;padding:4px 12px;margin-left:auto" onclick="genIdeaScript(3)">⚡ Generate Full Script →</button>
+      </div>
+    </div>
+
+    <!-- Generate Output -->
+    <div class="card" id="ideaScriptCard" style="display:none">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+        <div class="card-label" style="margin:0">Generated Script</div>
+        <div style="display:flex;gap:6px">
+          <button class="btn btn-outline" onclick="cpIdeaScript()" style="font-size:.73rem;padding:5px 10px">📋 Copy</button>
+          <button class="btn btn-outline" onclick="document.getElementById('ideaScriptCard').style.display='none'" style="font-size:.73rem;padding:5px 10px">✕ Close</button>
+        </div>
+      </div>
+      <div id="ideaScriptBox" class="sbox idle">Script will appear here</div>
+    </div>
+
+  </div>
+</div>
+<div id="pg-plan" class="pg">
+  <div style="max-width:860px;margin:0 auto">
+    <h2 style="font-family:'Syne',sans-serif;font-size:1.4rem;font-weight:800;margin-bottom:6px">🚀 17-Hour Launch Plan</h2>
+    <p style="color:var(--m);margin-bottom:22px;font-size:.84rem">From zero to your first paying client. Proven step-by-step.</p>
+    <div class="plan-grid">
+      <div class="psc">
+        <div class="psn">1</div>
+        <h3>Find 10 Prospects (30 min)</h3>
+        <p>Search Instagram for "Real estate Lagos" or "Solar Abuja". Find 10 accounts under 20k followers with no video content. Note their handles and WhatsApp numbers.</p>
+        <div class="tip">🎯 Goal: List of 10 warm prospects</div>
+      </div>
+      <div class="psc">
+        <div class="psn">2</div>
+        <h3>Build 3 Sample Videos (5 hrs)</h3>
+        <p>Use ScriptForge to generate 3 scripts. Click "Send to AI Video Creator", copy the clean script, paste into D-ID Studio or HeyGen (both free). Download your 3 AI avatar videos.</p>
+        <div class="tip">🎯 Goal: 3 real AI avatar videos on your phone</div>
+      </div>
+      <div class="psc">
+        <div class="psn">3</div>
+        <h3>Cold Outreach (3 hrs)</h3>
+        <p>DM all 10: "Hi [Name], I made 3 sample videos for your page — can I send them? Zero strings attached." WhatsApp works best. Send the actual video files.</p>
+        <div class="tip">🎯 Goal: 3+ replies (30–50% rate with free samples)</div>
+      </div>
+      <div class="psc">
+        <div class="psn">4</div>
+        <h3>Close + Deliver (8.5 hrs)</h3>
+        <p>Offer: <strong style="color:var(--t)">15 videos/month = ₦120,000/month.</strong> Collect 50% upfront (₦60k). Batch all 15 using ScriptForge + D-ID/HeyGen in 2 days. Collect balance.</p>
+        <div class="tip">🎯 Goal: 2 clients = ₦240k/month from your phone</div>
+      </div>
+    </div>
+
+    <div class="card" style="max-width:860px;margin:0 auto">
+      <div class="card-label">💰 Revenue Calculator</div>
+      <label style="margin-top:0">Monthly Clients: <strong id="cn" style="color:var(--gold)">3</strong></label>
+      <input type="range" min="1" max="20" value="3" id="cs" style="accent-color:var(--gold);width:100%;margin:10px 0 16px">
+      <div class="calc-grid">
+        <div class="cresb"><div class="cresv" id="rm">₦360k</div><div class="cresl">Monthly Revenue</div></div>
+        <div class="cresb"><div class="cresv" id="ry">₦4.3M</div><div class="cresl">Annual Revenue</div></div>
+        <div class="cresb"><div class="cresv" id="rh">~18hrs</div><div class="cresl">Work per Month</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+
+<!-- ═══ OJA MAKER PAGE ═══ -->
+<div id="pg-oja" class="pg">
+  <div class="oja-hero">
+    <div class="oja-title">🛒 OJA Maker — Content Engine</div>
+    <div class="oja-sub">AI-powered viral content for Oja-Direct, food group-buy platforms &amp; estate delivery. Market your site broadly in 5–6 days using zero ad spend.</div>
+    <div class="oja-stats">
+      <div class="oja-stat"><div class="oja-stat-n">5–6</div><div class="oja-stat-l">Days to Market</div></div>
+      <div class="oja-stat"><div class="oja-stat-n">20–30%</div><div class="oja-stat-l">Food Savings</div></div>
+      <div class="oja-stat"><div class="oja-stat-n">36</div><div class="oja-stat-l">States Covered</div></div>
+      <div class="oja-stat"><div class="oja-stat-n">₦0</div><div class="oja-stat-l">Ad Budget Needed</div></div>
+    </div>
+  </div>
+
+  <div class="oja-grid">
+    <!-- LEFT -->
+    <div>
+      <div class="card">
+        <div class="card-label">Business Details</div>
+        <label>Platform / Brand Name</label>
+        <input id="oja-brand" placeholder="e.g. Oja-Direct, FoodHub Lagos" value="Oja-Direct">
+        <label>Your Location / Estate</label>
+        <input id="oja-loc" placeholder="e.g. VGC Lekki, Abuja GRA, Enugu GRA">
+        <label>Primary Product</label>
+        <select id="oja-product">
+          <option>Rice (50kg bag)</option>
+          <option>Beans (50kg bag)</option>
+          <option>Palm Oil (25L keg)</option>
+          <option>Tomato Paste (carton)</option>
+          <option>Full food bundle — rice, beans, oil, pasta</option>
+          <option>All weekly staples</option>
+        </select>
+        <label>Target Audience</label>
+        <select id="oja-audience">
+          <option>Estate residents & families</option>
+          <option>Working class & young professionals</option>
+          <option>Mothers & homemakers</option>
+          <option>Small catering & chops businesses</option>
+          <option>Church groups & associations</option>
+          <option>Students & hostels</option>
+        </select>
+        <label>Delivery Schedule</label>
+        <select id="oja-delivery">
+          <option>Every Saturday to your estate gate</option>
+          <option>Every Friday delivery</option>
+          <option>Twice weekly — Tue & Sat</option>
+          <option>Monthly bulk delivery</option>
+        </select>
+        <label>Savings Headline</label>
+        <input id="oja-savings" placeholder="e.g. save ₦8,000–15,000/month" value="save ₦8,000–15,000/month">
+      </div>
+
+      <div class="card">
+        <div class="card-label">Content Type</div>
+        <div class="oja-ctypes">
+          <div class="oct on" id="oct0" onclick="setOCT(0)"><span class="oico">🎬</span><div class="onm">TikTok Script</div><div class="ods">30s viral reel</div></div>
+          <div class="oct" id="oct1" onclick="setOCT(1)"><span class="oico">📸</span><div class="onm">IG Caption</div><div class="ods">With hashtags</div></div>
+          <div class="oct" id="oct2" onclick="setOCT(2)"><span class="oico">💬</span><div class="onm">WhatsApp Blast</div><div class="ods">Group broadcast</div></div>
+          <div class="oct" id="oct3" onclick="setOCT(3)"><span class="oico">🖼</span><div class="onm">Carousel</div><div class="ods">5-slide FB/LinkedIn</div></div>
+          <div class="oct" id="oct4" onclick="setOCT(4)"><span class="oico">📣</span><div class="onm">Flyer Copy</div><div class="ods">Print & digital</div></div>
+          <div class="oct" id="oct5" onclick="setOCT(5)"><span class="oico">📊</span><div class="onm">Savings Proof</div><div class="ods">Real ₦ numbers</div></div>
+        </div>
+        <div class="card-label" style="margin-top:12px">Content Angle</div>
+        <div class="oja-angle-grid">
+          <div class="oja-angle on" id="oja-a0" onclick="setOjaAngle(0)"><span class="ai">💸</span>Save Money</div>
+          <div class="oja-angle" id="oja-a1" onclick="setOjaAngle(1)"><span class="ai">🤝</span>Community Buy</div>
+          <div class="oja-angle" id="oja-a2" onclick="setOjaAngle(2)"><span class="ai">😱</span>Price Shock</div>
+          <div class="oja-angle" id="oja-a3" onclick="setOjaAngle(3)"><span class="ai">🚚</span>Gate Delivery</div>
+          <div class="oja-angle" id="oja-a4" onclick="setOjaAngle(4)"><span class="ai">🔒</span>Escrow Safe</div>
+          <div class="oja-angle" id="oja-a5" onclick="setOjaAngle(5)"><span class="ai">👩‍👧</span>Mama Fed Up</div>
+        </div>
+        <button class="oja-gen-btn" id="ojaGenBtn" onclick="genOjaContent()">⚡ Generate OJA Content</button>
+      </div>
+
+      <div class="card">
+        <div class="card-label">Quick WhatsApp Messages</div>
+        <div class="quick-msgs">
+          <button class="qmsg-btn" onclick="genOjaMsg('intro')">💬 Estate Intro Broadcast</button>
+          <button class="qmsg-btn" onclick="genOjaMsg('savings')">💰 Price Comparison Message</button>
+          <button class="qmsg-btn" onclick="genOjaMsg('order')">🛒 Order Deadline Urgency</button>
+          <button class="qmsg-btn" onclick="genOjaMsg('captain')">🤝 Captain Recruitment</button>
+        </div>
+        <div class="sbox idle" id="msgBox" style="min-height:90px;margin-top:12px;font-size:.81rem">Generated WhatsApp message will appear here...</div>
+      </div>
+    </div>
+
+    <!-- RIGHT -->
+    <div>
+      <div class="card">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+          <div class="card-label" style="margin:0">Generated Content</div>
+          <div style="display:flex;gap:6px">
+            <button class="btn btn-outline" id="ojaCpBtn" onclick="cpOja()" disabled style="font-size:.73rem;padding:5px 11px">📋 Copy</button>
+            <button class="btn btn-outline" onclick="ojaToVideo()" style="font-size:.73rem;padding:5px 11px">🎬 → Video</button>
+          </div>
+        </div>
+        <div class="sbox idle" id="ojaBox">Click ⚡ Generate OJA Content above to create viral food/delivery content. Works for TikTok, Instagram, WhatsApp broadcasts, and Facebook.</div>
+      </div>
+
+      <div class="card">
+        <div class="card-label">🗓 5-Day Marketing Sprint</div>
+        <div class="day-sprint">
+          <div class="day-row d1">
+            <div class="day-row-t">Day 1 — Launch Content</div>
+            <div class="day-row-d">Post "Price Shock" TikTok + WhatsApp broadcast to 5 estate groups. Goal: 500 views, 20 inquiries.</div>
+          </div>
+          <div class="day-row d2">
+            <div class="day-row-t">Day 2 — Savings Proof</div>
+            <div class="day-row-d">Post savings calculator reel. Show before/after: market price vs your wholesale price. Collect DMs.</div>
+          </div>
+          <div class="day-row d3">
+            <div class="day-row-t">Day 3 — Community Push</div>
+            <div class="day-row-d">Share "Community Buy" carousel on Facebook + LinkedIn. Tag estate WhatsApp admins directly.</div>
+          </div>
+          <div class="day-row d4">
+            <div class="day-row-t">Day 4 — Deadline Urgency</div>
+            <div class="day-row-d">Post "Order by [day] for Saturday delivery." Create urgency. Follow up on all DMs from Day 2–3.</div>
+          </div>
+          <div class="day-row d5">
+            <div class="day-row-t">Day 5–6 — Testimonial & Scale</div>
+            <div class="day-row-d">Post first delivery photos + testimonials. Announce next order window. Build WhatsApp community.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="background:rgba(61,220,132,.03);border-color:rgba(61,220,132,.18)">
+        <div class="card-label" style="color:#3ddc84">⚡ Viral Hook Formulas for OJA</div>
+        <div style="display:flex;flex-direction:column;gap:7px">
+          <div style="background:#0a0a0a;border:1px solid var(--b2);border-radius:8px;padding:9px 12px;font-size:.78rem;color:var(--t);line-height:1.5"><strong style="color:var(--rd)">PRICE SHOCK:</strong> "Why are you paying ₦92,000 for rice when your neighbours are paying ₦68,000?"</div>
+          <div style="background:#0a0a0a;border:1px solid var(--b2);border-radius:8px;padding:9px 12px;font-size:.78rem;color:var(--t);line-height:1.5"><strong style="color:var(--gold)">SAVINGS:</strong> "20 families. One order. 30% cheaper. Delivered to your gate every Saturday."</div>
+          <div style="background:#0a0a0a;border:1px solid var(--b2);border-radius:8px;padding:9px 12px;font-size:.78rem;color:var(--t);line-height:1.5"><strong style="color:#3ddc84">PAIN:</strong> "No more queuing at Mile 12 in Lagos traffic. No more overpriced supermarket. OJA has entered."</div>
+          <div style="background:#0a0a0a;border:1px solid var(--b2);border-radius:8px;padding:9px 12px;font-size:.78rem;color:var(--t);line-height:1.5"><strong style="color:var(--bl)">TRUST:</strong> "Your money is held by Paystack escrow — only released after delivery. Zero risk."</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+let niche = 'r', styleIdx = 0;
+let lastScript = '', lastClean = '';
+let chatHist = [];
+
+const STYLES = [
+  'Stop Renting / Reality Check — shocking rent vs owning comparison with real ₦ numbers',
+  'Hidden Gem / Luxury Vibe — insider area knowledge, aspirational lifestyle, major FOMO',
+  'Avoid This Mistake — red flags, warnings, builds trust and authority fast',
+  'Day in the Life POV — first-person dream home or solar lifestyle experience',
+  'Solar Savings Calculator — exact ₦ savings, generator vs solar full breakdown',
+  'AI Picks Best Angle — most powerful, highest-converting hook for this exact offer',
+  'Don\'t Be a Victim — land scam warning, coordinate verification as the safety net',
+  'Professional Flex — showcase equipment/GIS tools, authority and credibility builder',
+  'Educational Carousel — step-by-step land documents guide, ends with platform CTA'
+];
+
+// ═══ NAV ═══
+function go(id, btn) {
+  document.querySelectorAll('.pg').forEach(p => p.classList.remove('on'));
+  document.querySelectorAll('.tab').forEach(b => b.classList.remove('on'));
+  document.getElementById('pg-' + id).classList.add('on');
+  if (btn) btn.classList.add('on');
+}
+function goTab(id) {
+  const map = { script: 0, video: 1, oja: 2, chat: 3, content: 4, plan: 5 };
+  go(id, document.querySelectorAll('.tab')[map[id]]);
+}
+
+function setN(n) {
+  niche = n;
+  ['r','s','g'].forEach(x => {
+    const el = document.getElementById('n'+x);
+    if (el) el.classList.toggle('on', x === n);
+  });
+}
+function setSt(i, el) {
+  styleIdx = i;
+  document.querySelectorAll('.spill').forEach(p => p.classList.remove('on'));
+  el.classList.add('on');
+}
+
+// ═══ CLAUDE API (built-in proxy — no key needed) ═══
+// ═══ API KEY — HARDCODED ═══
+const HARDCODED_KEY = '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';
+
+function getApiKey() { return HARDCODED_KEY; }
+function saveApiKey() {}
+
+async function callClaude(messages, system, maxTokens = 1200) {
+  const resp = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': HARDCODED_KEY,
+      'anthropic-version': '2023-06-01',
+      'anthropic-dangerous-direct-browser-access': 'true'
+    },
+    body: JSON.stringify({
+      model: 'claude-haiku-4-5-20251001',
+      max_tokens: maxTokens,
+      system: system,
+      messages: messages
+    })
+  });
+  if (!resp.ok) {
+    const err = await resp.json().catch(() => ({}));
+    throw new Error(err.error?.message || 'API error ' + resp.status);
+  }
+  const data = await resp.json();
+  return data.content.map(b => b.type === 'text' ? b.text : '').join('');
+}
+
+// ═══ SCRIPT GENERATION ═══
+async function genScript() {
+  const dur = document.getElementById('fd').value;
+  const maxW = dur === '15 seconds' ? 50 : dur === '30 seconds' ? 100 : 200;
+  const nn = niche === 's' ? 'Solar Energy' : niche === 'g' ? 'Surveying & Geoinformatics' : 'Real Estate';
+
+  const btn = document.getElementById('genBtn');
+  const box = document.getElementById('sbox');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spin"></span> Writing...';
+  box.className = 'sbox loading';
+  box.innerHTML = '<span class="spin spin-gold"></span> Claude is writing your script...';
+  ['cpBtn','dlBtn','toVidBtn'].forEach(id => document.getElementById(id).disabled = true);
+
+  const sys = `You are an elite Nigerian social media video scriptwriter for ${nn}. You write viral, emotionally powerful, culturally Nigerian scripts.
+
+Write in EXACTLY TWO clearly labelled sections:
+
+📺 FULL VIDEO SCRIPT
+[Include visual cues in brackets, emoji hooks, on-screen text suggestions, production notes]
+
+🎙️ CLEAN VOICEOVER
+[ONLY the spoken words. Zero brackets, zero stage directions, zero emoji, zero symbols. Natural conversational speech only. Maximum ${maxW} words. Punchy, human, and engaging.]
+
+Always use real ₦ amounts. Reference real Nigerian locations: Lekki, Ajah, Epe, Ibeju-Lekki, Magodo, GRA, Abuja, Port Harcourt.
+${niche === 'g' ? 'Address surveying pain points: land fraud, government acquisition, fake survey plans, coordinate verification, SurveyPro Elite platform, C of O scams, GPS/drone equipment rental, GIS tools.' : 'Address real Nigerian pain points: NEPA / power cuts, landlord wahala, land fraud, generator fuel costs, rising rents, traffic in Lagos.'}`;
+
+  const userMsg = `Write a ${dur} ${nn} video script for ${document.getElementById('fpl').value}.
+Style: ${STYLES[styleIdx]}
+Company/Agent: ${document.getElementById('fn').value.trim() || 'Nigerian real estate or solar business'}
+Location: ${document.getElementById('fl').value.trim() || 'Lagos and Abuja'}
+Offer/Price: ${document.getElementById('fp').value.trim() || 'realistic Nigerian market prices'}
+Audience: ${document.getElementById('fa').value.trim() || 'Nigerian buyers aged 25-45'}
+USP: ${document.getElementById('fu').value.trim() || 'create a compelling and believable USP'}
+Make it punchy, culturally Nigerian, emotionally charged, and ready to film immediately.`;
+
+  try {
+    const text = await callClaude([{ role: 'user', content: userMsg }], sys, 1400);
+    lastScript = text;
+    const vm = text.match(/🎙️ CLEAN VOICEOVER([\s\S]*)$/);
+    lastClean = vm ? vm[1].trim().replace(/\[.*?\]/gs, '').replace(/\n{3,}/g, '\n\n').trim() : '';
+    box.className = 'sbox';
+    box.innerHTML = fmt(text);
+    ['cpBtn','dlBtn','toVidBtn'].forEach(id => document.getElementById(id).disabled = false);
+  } catch (e) {
+    box.className = 'sbox';
+    box.innerHTML = '<span style="color:var(--rd)">❌ ' + esc(e.message) + '</span>';
+  }
+  btn.disabled = false;
+  btn.innerHTML = '⚡ Generate Script';
+}
+
+function fmt(t) {
+  return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/\n/g, '<br>')
+    .replace(/(📺[^<\n]*|🎙️[^<\n]*)/g, '<strong style="color:var(--gold);font-family:\'Syne\',sans-serif;font-size:.68rem;text-transform:uppercase;letter-spacing:.1em;display:inline-block;margin-top:16px">$1</strong>');
+}
+function esc(s) { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+async function refine(type) {
+  if (!lastScript) { toast('Generate a script first!'); return; }
+  const prompts = {
+    shorter: 'Cut this script by 40%. Keep the best hook and the CTA. Output the revised script in the same two-section format.',
+    punchier: 'Rewrite — more urgent, emotional, punchy Nigerian energy. Shorter sentences. Output same two-section format.',
+    hooks: 'Write 5 completely different opening hooks for the first 3 seconds. Number them 1-5. Each on its own line.',
+    caption: 'Write ONLY a full Instagram/TikTok caption: emojis, strong CTA, 15 relevant Nigerian hashtags.',
+    objections: 'List the top 5 objections Nigerian buyers have + a tight 2-sentence script response to each.'
+  };
+  const box = document.getElementById('sbox');
+  box.className = 'sbox loading';
+  box.innerHTML = '<span class="spin spin-gold"></span> Refining...';
+  try {
+    const text = await callClaude(
+      [{ role: 'user', content: 'Script:\n\n' + lastScript + '\n\n---\nTask: ' + prompts[type] }],
+      'Expert Nigerian video scriptwriter. Output only exactly what was requested. No preamble or commentary.',
+      900
+    );
+    lastScript = text;
+    box.className = 'sbox';
+    box.innerHTML = fmt(text);
+  } catch (e) {
+    box.className = 'sbox';
+    box.innerHTML = '<span style="color:var(--rd)">❌ ' + esc(e.message) + '</span>';
+  }
+}
+
+function cpScript() {
+  navigator.clipboard.writeText(document.getElementById('sbox').innerText)
+    .then(() => { toast('✅ Script copied!'); document.getElementById('sbox').classList.add('script-copied'); setTimeout(() => document.getElementById('sbox').classList.remove('script-copied'), 400); })
+    .catch(() => toast('❌ Copy failed — try selecting text manually'));
+}
+function dlScript() {
+  const b = new Blob([document.getElementById('sbox').innerText], { type: 'text/plain' });
+  const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = 'script-ng.txt'; a.click();
+}
+function goToVideo() {
+  const s = lastClean || lastScript
+    .replace(/\[.*?\]/gs, '').replace(/📺.*?\n/gs, '')
+    .replace(/🎙️ CLEAN VOICEOVER\s*/i, '')
+    .replace(/[🎬📱🤖📣📺🎤].*/g, '').replace(/\n{2,}/g, '\n').trim();
+  document.getElementById('vidScript').value = s.substring(0, 600);
+  updChars();
+  goTab('video');
+}
+
+// ═══ VIDEO SCRIPT ═══
+function updChars() {
+  const v = document.getElementById('vidScript').value;
+  const el = document.getElementById('charCount');
+  el.textContent = v.length + ' chars';
+  el.style.color = v.length > 500 ? 'var(--rd)' : v.length > 350 ? 'var(--gold)' : 'var(--m)';
+}
+function cleanForSpeech() {
+  if (lastClean) {
+    document.getElementById('vidScript').value = lastClean.substring(0, 600);
+    updChars(); toast('✅ Clean voiceover applied!'); return;
+  }
+  let c = (document.getElementById('vidScript').value || lastScript || '')
+    .replace(/\[.*?\]/gs, '').replace(/📺.*?\n/gs, '')
+    .replace(/🎙️ CLEAN VOICEOVER\s*/i, '')
+    .replace(/[🎬📱🤖📣📺🎤✨💰💎⚡🚩🎯].*/g, '')
+    .replace(/Scene \d+:.*/g, '').replace(/Visual:.*/gi, '')
+    .replace(/\*\*.+?\*\*/g, '').replace(/#+\s.+/g, '')
+    .replace(/\n{2,}/g, '\n').trim();
+  document.getElementById('vidScript').value = c.substring(0, 600);
+  updChars(); toast('✅ Script cleaned for speech!');
+}
+function copyVidScript() {
+  const txt = document.getElementById('vidScript').value.trim();
+  if (!txt) { toast('No script yet — generate one first!'); return; }
+  navigator.clipboard.writeText(txt)
+    .then(() => toast('✅ Script copied! Now paste it into D-ID Studio or HeyGen'))
+    .catch(() => toast('❌ Copy failed — select text manually'));
+}
+
+// ═══ CHAT ═══
+const CSYS = `You are an expert Nigerian real estate, solar energy, and surveying/geoinformatics content marketing consultant powered by Claude AI.
+Be extremely specific — give actual scripts, messages, exact ₦ calculations, not vague advice.
+Use real ₦ amounts and real Nigerian locations. Current petrol approximately ₦1,200/litre.
+For surveying topics: reference SurveyPro Elite platform, coordinate verification, C of O, Governor's Consent, Approved Survey Plans (Red Copy), government acquisition zones, GPS/drone equipment rental, GIS tools.
+Format your responses clearly. Use numbered lists or bullet points where helpful. Be direct and immediately actionable.`;
+
+async function sendChat() {
+  const inp = document.getElementById('cin');
+  const msg = inp.value.trim();
+  if (!msg) return;
+  const btn = document.getElementById('csend');
+  btn.disabled = true;
+  addMsg('user', msg);
+  chatHist.push({ role: 'user', content: msg });
+  inp.value = '';
+  const thinking = addMsg('ai', '⏳ Thinking...');
+  try {
+    const text = await callClaude([...chatHist], CSYS, 1400);
+    chatHist.push({ role: 'assistant', content: text });
+    thinking.textContent = text;
+  } catch (e) {
+    thinking.textContent = '❌ ' + e.message;
+    thinking.style.color = 'var(--rd)';
+    chatHist.pop();
+  }
+  btn.disabled = false;
+  document.getElementById('cmsgs').scrollTop = 99999;
+}
+function addMsg(role, text) {
+  const wrap = document.getElementById('cmsgs');
+  const d = document.createElement('div');
+  d.className = 'msg ' + role; d.textContent = text;
+  wrap.appendChild(d); wrap.scrollTop = 99999; return d;
+}
+function useQ(el) {
+  document.getElementById('cin').value = el.textContent.trim();
+  goTab('chat'); document.getElementById('cin').focus();
+}
+
+// ═══ CALC ═══
+function calcR() {
+  const c = parseInt(document.getElementById('cs').value) || 1;
+  const m = c * 120000, y = m * 12, h = c * 6;
+  document.getElementById('cn').textContent = c;
+  document.getElementById('rm').textContent = m >= 1e6 ? '₦' + (m/1e6).toFixed(1) + 'M' : '₦' + (m/1e3).toFixed(0) + 'k';
+  document.getElementById('ry').textContent = y >= 1e6 ? '₦' + (y/1e6).toFixed(1) + 'M' : '₦' + (y/1e3).toFixed(0) + 'k';
+  document.getElementById('rh').textContent = '~' + h + 'hrs';
+}
+calcR();
+document.getElementById('cs').addEventListener('input', calcR);
+
+// ═══ CONTENT IDEAS SCRIPT GENERATOR ═══
+const IDEA_PROMPTS = {
+  1: `Write a viral 30-second TikTok/Instagram Reels video script for a Nigerian surveying and geoinformatics firm called SurveyPro Elite.
+Style: "Don't Be a Victim" — Fear hook, then solution.
+Video style: Person pointing at a "For Sale" sign on bush land. Urgent, direct-to-camera.
+On-screen text hook: "Before you pay ₦5 Million for this land, WATCH THIS."
+The script must warn viewers about buying land without coordinate verification, explain the risk of government acquisition zones, and offer SurveyPro Elite's Coordinate Tool as the safety net.
+Use real ₦ amounts. End with a clear CTA to check the link in bio.`,
+
+  2: `Write a 30-second professional TikTok/Instagram script for SurveyPro Elite — a Nigerian surveying and geoinformatics platform.
+Style: "Professional Flex" — authority, trust, aspirational.
+Video style: Screen recording of SurveyPro Elite website scrolling through Equipment Rental (Drones, GPS) or GIS Tools section. Trending upbeat audio.
+Caption angle: "Why stress about finding a surveyor when you can book everything in one place?"
+Make it confident, modern, and showcase 2026 positioning. End with a CTA to visit the platform.`,
+
+  3: `Write the caption and all 5 slide scripts for a LinkedIn/Facebook educational carousel post for SurveyPro Elite.
+Topic: "3 Documents you MUST ask for before buying land in Lagos"
+Slide 1: Strong hook headline
+Slide 2: Document 1 — Approved Survey Plan (Red Copy) — explain why it matters
+Slide 3: Document 2 — C of O or Governor's Consent — explain why it matters  
+Slide 4: Document 3 — Receipt of Purchase — explain why it matters
+Slide 5: CTA — "Confused? Upload your coordinates on SurveyPro Elite and let us do the heavy lifting for you."
+Make each slide punchy (max 40 words). Professional but accessible tone. Nigerian context throughout.`
+};
+
+async function genIdeaScript(num) {
+  const card = document.getElementById('ideaScriptCard');
+  const box = document.getElementById('ideaScriptBox');
+  card.style.display = 'block';
+  card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  box.className = 'sbox loading';
+  box.innerHTML = '<span class="spin spin-gold"></span> Generating script for Content Idea ' + num + '...';
+
+  const sys = `You are an elite Nigerian social media video scriptwriter specialising in surveying, geoinformatics, and real estate content.
+Write in EXACTLY TWO clearly labelled sections:
+📺 FULL VIDEO SCRIPT
+[Include visual cues in brackets, emoji hooks, on-screen text suggestions]
+🎙️ CLEAN VOICEOVER (or SLIDE COPY for carousels)
+[ONLY the spoken/written words. No brackets, no directions, no emoji. Clean and punchy.]`;
+
+  try {
+    const text = await callClaude([{ role: 'user', content: IDEA_PROMPTS[num] }], sys, 1200);
+    box.className = 'sbox';
+    box.innerHTML = fmt(text);
+  } catch(e) {
+    box.className = 'sbox';
+    box.innerHTML = '<span style="color:var(--rd)">❌ ' + esc(e.message) + '</span>';
+  }
+}
+
+function cpIdeaScript() {
+  navigator.clipboard.writeText(document.getElementById('ideaScriptBox').innerText)
+    .then(() => toast('✅ Script copied!'))
+    .catch(() => toast('❌ Copy failed'));
+}
+
+// ═══ TOAST ═══
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.background = msg.startsWith('❌') ? 'var(--rd)' : 'var(--gr)';
+  t.classList.add('on');
+  clearTimeout(t._t); t._t = setTimeout(() => t.classList.remove('on'), 4000);
+}
+
+// ═══ OJA MAKER STATE ═══
+let ojaContentType = 0;
+let ojaAngle = 0;
+let lastOjaContent = '';
+
+const OJA_CONTENT_TYPES = [
+  'TikTok / Instagram Reels video script (30 seconds)',
+  'Instagram caption with 15 Nigerian hashtags',
+  'WhatsApp group broadcast message',
+  'LinkedIn/Facebook carousel post (5 slides)',
+  'Flyer copy for print and digital distribution',
+  'Savings comparison script with real Nigerian ₦ prices'
+];
+
+const OJA_ANGLES = [
+  'Save Money — show exact ₦ price gap between market price and wholesale price',
+  'Community Buy — power of 20-50 families ordering together at bulk discount',
+  'Market Price Shock — react to insane Lagos/Abuja market prices, then show cheaper option',
+  'Gate Delivery Convenience — no traffic, no queue, delivered to your estate door every Saturday',
+  'Escrow Security — money held by Paystack escrow, only released after delivery confirmed',
+  "Mama Fed Up — story from perspective of tired Nigerian mother who found a smarter way to shop"
+];
+
+function setOCT(i) {
+  ojaContentType = i;
+  for (let j = 0; j < 6; j++) {
+    const el = document.getElementById('oct' + j);
+    if (el) el.classList.toggle('on', j === i);
+  }
+}
+
+function setOjaAngle(i) {
+  ojaAngle = i;
+  for (let j = 0; j < 6; j++) {
+    const el = document.getElementById('oja-a' + j);
+    if (el) el.classList.toggle('on', j === i);
+  }
+}
+
+async function genOjaContent() {
+  const brand = document.getElementById('oja-brand').value.trim() || 'Oja-Direct';
+  const loc = document.getElementById('oja-loc').value.trim() || 'your estate';
+  const product = document.getElementById('oja-product').value;
+  const audience = document.getElementById('oja-audience').value;
+  const delivery = document.getElementById('oja-delivery').value;
+  const savings = document.getElementById('oja-savings').value.trim() || 'save 20-30%';
+  const ctype = OJA_CONTENT_TYPES[ojaContentType];
+  const angle = OJA_ANGLES[ojaAngle];
+
+  const btn = document.getElementById('ojaGenBtn');
+  const box = document.getElementById('ojaBox');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spin"></span> Generating...';
+  box.className = 'sbox loading';
+  box.innerHTML = '<span class="spin spin-gold"></span> Writing your OJA content...';
+
+  const sys = `You are an expert Nigerian food/delivery/group-buy content creator. You write viral, real, culturally accurate content for Nigerian platforms like Oja-Direct.
+Use real Nigerian ₦ prices (rice: ~₦68k wholesale vs ₦92k market per 50kg bag), real estate/location names, real Nigerian expressions and Pidgin where it adds authenticity.
+Be direct, emotional, and relatable. Use numbers to prove savings. Keep it punchy and shareable.
+Output ONLY the content itself — no explanations, no preamble.`;
+
+  const userMsg = `Create: ${ctype}
+Platform/Brand: ${brand}
+Location: ${loc}
+Product focus: ${product}
+Target audience: ${audience}
+Delivery: ${delivery}
+Savings: ${savings}
+Angle: ${angle}
+
+Make this highly viral and shareable for Nigerian social media. Include real Nigerian context, real price comparisons, and strong emotional hook.`;
+
+  try {
+    const text = await callClaude([{ role: 'user', content: userMsg }], sys, 1100);
+    lastOjaContent = text;
+    box.className = 'sbox';
+    box.innerHTML = fmt(text);
+    document.getElementById('ojaCpBtn').disabled = false;
+    toast('✅ OJA content ready!');
+  } catch (e) {
+    box.className = 'sbox';
+    box.innerHTML = '<span style="color:var(--rd)">❌ ' + esc(e.message) + '</span>';
+    toast('❌ ' + e.message);
+  }
+  btn.disabled = false;
+  btn.innerHTML = '⚡ Generate OJA Content';
+}
+
+function cpOja() {
+  navigator.clipboard.writeText(document.getElementById('ojaBox').innerText)
+    .then(() => toast('✅ Copied!'))
+    .catch(() => toast('❌ Copy failed'));
+}
+
+function ojaToVideo() {
+  const txt = lastOjaContent || document.getElementById('ojaBox').innerText;
+  if (!txt || txt.includes('Click ⚡')) { toast('Generate content first!'); return; }
+  const clean = txt.replace(/\[.*?\]/gs,'').replace(/\n{2,}/g,'\n').trim();
+  document.getElementById('vidScript').value = clean.substring(0, 600);
+  updChars();
+  goTab('video');
+  toast('✅ Sent to AI Video Creator!');
+}
+
+async function genOjaMsg(type) {
+  const brand = document.getElementById('oja-brand').value.trim() || 'Oja-Direct';
+  const loc = document.getElementById('oja-loc').value.trim() || 'your estate';
+  const product = document.getElementById('oja-product').value;
+  const savings = document.getElementById('oja-savings').value.trim() || 'save ₦8,000/month';
+  const delivery = document.getElementById('oja-delivery').value;
+  const box = document.getElementById('msgBox');
+  box.className = 'sbox loading';
+  box.innerHTML = '<span class="spin spin-gold"></span> Writing message...';
+
+  const prompts = {
+    intro: `Write a WhatsApp broadcast message (max 180 words) introducing ${brand} to a Nigerian estate WhatsApp group. We deliver wholesale ${product} to ${loc}. Savings: ${savings}. Delivery: ${delivery}. Friendly, not salesy. End with "Reply YES to join the next order."`,
+    savings: `Write a WhatsApp broadcast message (max 150 words) showing the price comparison: buying ${product} at Lagos/Abuja market vs through ${brand}. Use real Nigerian ₦ prices (be specific). Show monthly savings of ${savings} for a family. Location: ${loc}. End with strong CTA.`,
+    order: `Write an urgent WhatsApp broadcast (max 120 words) announcing the order deadline for this Saturday's delivery. Platform: ${brand}. Location: ${loc}. Product: ${product}. Create urgency — limited slots. Tell people to reply "ORDER" by a specific day/time to secure their spot.`,
+    captain: `Write a WhatsApp message (max 160 words) recruiting an estate "Oja Captain" for ${brand} in ${loc}. They coordinate orders in their building or estate and earn a commission per order. Show approximate monthly earnings (e.g. 20 households × ₦X commission). Professional but warm tone. End with CTA to WhatsApp you to register.`
+  };
+
+  try {
+    const text = await callClaude(
+      [{ role: 'user', content: prompts[type] }],
+      'Nigerian WhatsApp marketing copywriter. Write ONLY the message — no intro, no commentary. Real ₦ prices. Conversational Nigerian English.',
+      600
+    );
+    box.className = 'sbox';
+    box.textContent = text;
+    toast('✅ Message ready!');
+  } catch (e) {
+    box.className = 'sbox';
+    box.innerHTML = '<span style="color:var(--rd)">❌ ' + esc(e.message) + '</span>';
+    toast('❌ ' + e.message);
+  }
+}
+
+
+
+</script>
+</body>
+</html>
